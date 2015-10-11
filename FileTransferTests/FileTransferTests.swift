@@ -33,4 +33,44 @@ class FileTransferTests: XCTestCase {
         }
     }
     
+    func testDownloadTask_OnCreation_AcceptsURL () {
+        
+        let url = NSURL(string: "http://google.vn")!
+        let downloadTask = makeDownloadTask(url)
+        
+        let someOtherURL = NSURL(string: "http://apple.com")!
+        XCTAssertNotEqual(someOtherURL, downloadTask.remoteURL)
+        
+        
+    }
+    
+    func testDownloadTask_AfterCreation_AllowsSettingFilePath () {
+        
+        let url = NSURL(string: "http://google.vn")!
+        let downloadTask = makeDownloadTask(url)
+
+        let filePath = "/var/app/myfile.ext"
+        downloadTask.filePath = filePath
+        XCTAssertEqual(filePath, downloadTask.filePath)
+        
+        let anotherFilePath = "var/app/some_otherfile.ext"
+        XCTAssertNotEqual(anotherFilePath, downloadTask.filePath)
+        
+        
+    }
+    
+    func testDownloadTask_WhenErrorOccured_NotifiesTheObserver () {
+        
+        
+        
+    }
+    
+    func makeDownloadTask (url : NSURL) -> DownloadTask {
+        
+        let aDownloadTask = DownloadTask(url: url)
+        XCTAssertEqual(url, aDownloadTask.remoteURL)
+        return aDownloadTask
+        
+    }
+    
 }
