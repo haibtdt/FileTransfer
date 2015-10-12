@@ -7,10 +7,11 @@
 //
 
 import UIKit
+import CoreData
 
 public protocol DownloadTaskManagerObserver : class {
     
-    func taskAdded ()
+    func taskAdded (url : NSURL, saveAs filePath : NSURL)
     func taskCompleted()
     func taskRemoved()
     func taskFailed()
@@ -21,10 +22,45 @@ public protocol DownloadTaskManagerObserver : class {
 public class DownloadTaskManager: NSObject {
     
     weak public var observer : DownloadTaskManagerObserver?  = nil
+    
+    let persistenceSetup : DownloadTaskManagerPersistenceStackSetup
+    let temptDirectoryURL : NSURL
 
-    public func scheduleDownload (url : NSURL, saveAs filePath : NSURL) {
+    public init(tempDirectoryURL : NSURL, var databasesURL : NSURL? = nil) {
         
-        observer?.taskAdded()
+        if databasesURL == nil {
+            
+            var storeURL : NSURL {
+                
+                let defaultFileManager = NSFileManager.defaultManager()
+                let appDirURL = try! defaultFileManager.URLForDirectory(NSSearchPathDirectory.ApplicationSupportDirectory, inDomain: .UserDomainMask, appropriateForURL: nil, create: true)
+                return appDirURL.URLByAppendingPathComponent("assets.store")
+                
+                
+            }
+            databasesURL = storeURL
+            
+        }
+        
+        persistenceSetup = DownloadTaskManagerPersistenceStackSetup(storePath: databasesURL!)
+        self.temptDirectoryURL = tempDirectoryURL
+        persistenceSetup.setUpContext()
+        
+        
+    }
+
+    
+    public func scheduleDownload (url : NSURL, saveAs fileURL : NSURL) throws{
+        
+        let addedTaskMetaData = NSEntityDescription.insertNewObjectForEntityForName(DownloadTaskMetaData.entityName, inManagedObjectContext: persistenceSetup.context) as! DownloadTaskMetaData
+        addedTaskMetaData.dateAdded = NSDate()
+        addedTaskMetaData.fileURL = fileURL.absoluteString
+        addedTaskMetaData.remoteURL = url.absoluteString
+        addedTaskMetaData.identifier = url.absoluteString
+        addedTaskMetaData.status = NSNumber(integer: TaskStatus.Added.rawValue)
+        addedTaskMetaData.summary = "Download task meta data for remote file: \(url.absoluteString)"
+        try persistenceSetup.context.save()
+        observer?.taskAdded(url, saveAs: fileURL)
         
     }
     
@@ -34,10 +70,130 @@ public class DownloadTaskManager: NSObject {
         
     }
     
-    public func resume () {
+    
+    var allDownloadTasksMetadata : [DownloadTaskMetaData]{
+        
+        let fetchRequest = NSFetchRequest(entityName: DownloadTaskMetaData.entityName)
+        fetchRequest.predicate = NSPredicate(value: true)
+        
+        do {
+            
+            let results = try persistenceSetup.context.executeFetchRequest(fetchRequest)
+            return results as! [DownloadTaskMetaData]
+            
+            
+        } catch {
+            
+            return []
+            
+        }
         
         
         
     }
     
+    
+    var currentActiveTracker : DownloadTaskTracker? = nil
+    public func resume () {
+        
+        guard currentActiveTracker == nil else {
+            
+            return
+            
+        }
+        
+        for metaData in allDownloadTasksMetadata {
+            
+            
+            
+            guard checkCompleteness(metaData) == false else {
+                
+                continue
+                
+            }
+            
+
+            currentActiveTracker = makeTracker(metaData)
+            currentActiveTracker?.downloadTask?.resume()
+            break
+            
+            
+        }
+        
+        
+        
+        
+        
+    }
+    
+    func makeTracker (meta : DownloadTaskMetaData) -> DownloadTaskTracker {
+        
+        let downloadTask = DownloadTask(url: NSURL(string: meta.remoteURL!)!)
+        let downloadTaskTracker = DownloadTaskTracker(task: downloadTask, meta: meta)
+        return downloadTaskTracker
+        
+        
+    }
+    
+    
+    func checkCompleteness(meta : DownloadTaskMetaData) -> Bool {
+        
+        if meta.status?.integerValue == TaskStatus.Done.rawValue {
+            
+            return true
+            
+        }
+        
+        return false
+        
+    }
+    
 }
+
+
+class DownloadTaskManagerPersistenceStackSetup : NSObject{
+    
+    var storePath_ : NSURL
+    var storePath : NSURL {
+        
+        return storePath_
+        
+    }
+    
+    
+    
+    init (storePath : NSURL) {
+        
+        storePath_ = storePath
+        
+    }
+    
+    
+    var context_ : NSManagedObjectContext! = nil
+    var context : NSManagedObjectContext! {
+        
+        return context_
+        
+    }
+    
+    
+    func setUpContext () {
+        
+        if context_ == nil {
+            
+            let thisBundle = NSBundle(forClass: DownloadTaskManagerPersistenceStackSetup.classForCoder())
+            var managedModel_ : NSManagedObjectModel! = nil
+            var persistenceCoordinator_ : NSPersistentStoreCoordinator! = nil
+            managedModel_ = NSManagedObjectModel(contentsOfURL: thisBundle.URLForResource("Model", withExtension: "momd")!)
+            persistenceCoordinator_ = NSPersistentStoreCoordinator(managedObjectModel: managedModel_)
+            try! persistenceCoordinator_.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storePath, options: [NSInferMappingModelAutomaticallyOption:true])
+            context_ = NSManagedObjectContext(concurrencyType: .MainQueueConcurrencyType)
+            context_?.persistentStoreCoordinator = persistenceCoordinator_
+            
+        }
+        
+    }
+    
+}
+
+

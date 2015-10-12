@@ -13,6 +13,7 @@
 		30C2B2031BCABED7002DB553 /* DownloadTaskTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C2B2021BCABED7002DB553 /* DownloadTaskTracker.swift */; settings = {ASSET_TAGS = (); }; };
 		30C2B2051BCAC2EB002DB553 /* DownloadTaskManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C2B2041BCAC2EB002DB553 /* DownloadTaskManager.swift */; settings = {ASSET_TAGS = (); }; };
 		30DF7F841BC88FA9001D4E34 /* DownloadTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30DF7F831BC88FA9001D4E34 /* DownloadTask.swift */; settings = {ASSET_TAGS = (); }; };
+		46C040941BCB45F400702EA0 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46C040931BCB45F400702EA0 /* CoreData.framework */; };
 		F6CEBE871BC7F807002C4F64 /* FileTransfer.h in Headers */ = {isa = PBXBuildFile; fileRef = F6CEBE861BC7F807002C4F64 /* FileTransfer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F6CEBE8E1BC7F807002C4F64 /* FileTransfer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6CEBE831BC7F807002C4F64 /* FileTransfer.framework */; settings = {ASSET_TAGS = (); }; };
 		F6CEBE931BC7F807002C4F64 /* FileTransferTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6CEBE921BC7F807002C4F64 /* FileTransferTests.swift */; };
@@ -64,6 +65,7 @@
 		30C2B2021BCABED7002DB553 /* DownloadTaskTracker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadTaskTracker.swift; sourceTree = "<group>"; };
 		30C2B2041BCAC2EB002DB553 /* DownloadTaskManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadTaskManager.swift; sourceTree = "<group>"; };
 		30DF7F831BC88FA9001D4E34 /* DownloadTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadTask.swift; sourceTree = "<group>"; };
+		46C040931BCB45F400702EA0 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		F6CEBE831BC7F807002C4F64 /* FileTransfer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = FileTransfer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F6CEBE861BC7F807002C4F64 /* FileTransfer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileTransfer.h; sourceTree = "<group>"; };
 		F6CEBE881BC7F807002C4F64 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -85,6 +87,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				46C040941BCB45F400702EA0 /* CoreData.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -138,6 +141,7 @@
 				30C2B2021BCABED7002DB553 /* DownloadTaskTracker.swift */,
 				30A6A3281BCABBAB00A5BEE4 /* Model.xcdatamodeld */,
 				30C2B2041BCAC2EB002DB553 /* DownloadTaskManager.swift */,
+				46C040931BCB45F400702EA0 /* CoreData.framework */,
 			);
 			path = FileTransfer;
 			sourceTree = "<group>";

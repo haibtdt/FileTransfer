@@ -15,8 +15,11 @@ enum TaskStatus : Int {
     
 }
 
-class DownloadTaskMetaData: NSManagedObject {
+public class DownloadTaskMetaData: NSManagedObject {
 
 // Insert code here to add functionality to your managed object subclass
+    
+    static let entityName = "DownloadTaskMetaData"
 
+    
 }
