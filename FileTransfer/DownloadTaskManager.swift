@@ -19,7 +19,7 @@ public protocol DownloadTaskManagerObserver : class {
     
 }
 
-public class DownloadTaskManager: NSObject {
+public class DownloadTaskManager: NSObject , DownloadTaskTrackerObserver {
     
     weak public var observer : DownloadTaskManagerObserver?  = nil
     
@@ -93,15 +93,17 @@ public class DownloadTaskManager: NSObject {
     }
     
     
-    var currentActiveTracker : DownloadTaskTracker? = nil
-    public func resume () {
+    var currentActiveTracker_ : DownloadTaskTracker? = nil
+    var currentActiveTracker : DownloadTaskTracker? {
         
-        guard currentActiveTracker == nil else {
+        guard currentActiveTracker_ == nil else {
             
-            return
+            return currentActiveTracker_
             
         }
         
+        
+        // find next one
         for metaData in allDownloadTasksMetadata {
             
             
@@ -112,26 +114,23 @@ public class DownloadTaskManager: NSObject {
                 
             }
             
-
-            currentActiveTracker = makeTracker(metaData)
-            currentActiveTracker?.downloadTask?.resume()
+            let downloadTask = DownloadTask(url: NSURL(string: metaData.remoteURL!)!)
+            currentActiveTracker_ = DownloadTaskTracker(task: downloadTask, meta: metaData)
+            currentActiveTracker_?.trackerObserver = self
             break
-            
+
             
         }
-        
-        
-        
-        
+
+        return currentActiveTracker_
         
     }
     
-    func makeTracker (meta : DownloadTaskMetaData) -> DownloadTaskTracker {
+    
+    public func resume () {
         
-        let downloadTask = DownloadTask(url: NSURL(string: meta.remoteURL!)!)
-        let downloadTaskTracker = DownloadTaskTracker(task: downloadTask, meta: meta)
-        return downloadTaskTracker
-        
+        currentActiveTracker?.downloadTask?.resume()
+
         
     }
     
@@ -147,6 +146,16 @@ public class DownloadTaskManager: NSObject {
         return false
         
     }
+    
+    
+    func downloadTaskMetaDataChanged (task: DownloadTask, tracker : DownloadTaskTracker){
+        
+        //persist it!
+        try! persistenceSetup.context.save()
+        
+        
+    }
+
     
 }
 

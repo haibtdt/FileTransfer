@@ -13,6 +13,7 @@ protocol DownloadTaskObserver : class{
     func taskStarted(task : DownloadTask)
     func taskDone(task : DownloadTask)
     func taskFailed(task : DownloadTask)
+    
 }
 
 public class DownloadTask {
