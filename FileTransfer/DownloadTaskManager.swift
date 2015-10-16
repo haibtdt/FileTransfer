@@ -12,7 +12,8 @@ import CoreData
 public protocol DownloadTaskManagerObserver : class {
     
     func taskAdded (url : NSURL, saveAs filePath : NSURL)
-    func taskCompleted()
+    func taskActivated (url : NSURL, saveAs filePath : NSURL)
+    func taskCompleted(url : NSURL, saveAs filePath : NSURL)
     func taskRemoved()
     func taskFailed()
     
@@ -115,6 +116,7 @@ public class DownloadTaskManager: NSObject , DownloadTaskTrackerObserver {
             }
             
             let downloadTask = DownloadTask(url: NSURL(string: metaData.remoteURL!)!)
+            downloadTask.filePath = metaData.fileURL!
             currentActiveTracker_ = DownloadTaskTracker(task: downloadTask, meta: metaData)
             currentActiveTracker_?.trackerObserver = self
             break
@@ -152,6 +154,22 @@ public class DownloadTaskManager: NSObject , DownloadTaskTrackerObserver {
         
         //persist it!
         try! persistenceSetup.context.save()
+        let remoteURL = NSURL(string: (tracker.downloadTaskMetaData?.remoteURL)!)!
+        let fileURL = NSURL(string: (tracker.downloadTaskMetaData?.fileURL)!)!
+        switch TaskStatus(rawValue: (tracker.downloadTaskMetaData?.status?.integerValue)!)! {
+            
+        case .Done:
+            observer?.taskCompleted(remoteURL, saveAs: fileURL)
+            currentActiveTracker_ = nil
+        case .Failed:
+            observer?.taskFailed()
+            currentActiveTracker_ = nil
+        case .InProgress:
+            observer?.taskActivated(remoteURL, saveAs: fileURL)
+        case .Added:
+            assert(false)
+            
+        }
         
         
     }

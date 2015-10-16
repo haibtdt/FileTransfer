@@ -7,11 +7,74 @@
 //
 
 import UIKit
+import FileTransfer
 
-class DetailViewController: UIViewController {
+class DetailViewController: UIViewController, DownloadTaskManagerObserver {
 
     @IBOutlet weak var detailDescriptionLabel: UILabel!
 
+    
+    @IBOutlet weak var taskStatusLabel: UILabel!
+    @IBOutlet weak var remoteURLField: UITextField!
+    var saveDirURL : NSURL {
+        
+        let defaultManager = NSFileManager.defaultManager()
+        return defaultManager.URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask).first!
+        
+        
+        
+    }
+    
+    var downloadManager_ : DownloadTaskManager? = nil
+    var downloadManager : DownloadTaskManager {
+        
+        if downloadManager_ == nil {
+            
+            downloadManager_ = DownloadTaskManager(tempDirectoryURL: saveDirURL)
+            downloadManager_?.observer = self
+            
+        }
+        return downloadManager_!
+        
+    }
+    
+    @IBAction func startDownload(sender: AnyObject) {
+        
+        downloadManager.resume()
+        
+    }
+    
+    
+    @IBAction func addDownloadTask(sender: AnyObject) {
+        
+        
+        guard remoteURLField.text!.isEmpty == false else {
+            
+            return
+            
+        }
+        
+        if let remoteURL = NSURL(string: remoteURLField.text!) {
+            
+            let fileURL = saveDirURL.URLByAppendingPathComponent(remoteURL.lastPathComponent ?? "no_name")
+            if let _ = try? downloadManager.scheduleDownload(remoteURL, saveAs: fileURL) {
+                
+                print("added \(remoteURL) with save path: \(fileURL)")
+
+                
+            } else {
+                
+                print("failed to add task with \(remoteURL) to save path: \(fileURL)")
+                
+            }
+            
+            
+        }
+
+        
+        
+    }
+    
 
     var detailItem: AnyObject? {
         didSet {
@@ -39,6 +102,44 @@ class DetailViewController: UIViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
+    func taskAdded (url : NSURL, saveAs filePath : NSURL){
+        
+        taskStatusLabel.text = "added \(url) as a task and will be saved at \(filePath)"
+        
+    }
+    
+    
+    func taskActivated (url : NSURL, saveAs filePath : NSURL){
+        
+        
+        taskStatusLabel.text = "activated \(url) as a task and will be saved at \(filePath)"
+
+        
+    }
+    
+    
+    func taskCompleted(url : NSURL, saveAs filePath : NSURL) {
+        
+        taskStatusLabel.text = "completed \(url) as a task and will be saved at \(filePath)"
+ 
+        
+    }
+    
+    
+    func taskRemoved(){
+        
+        
+        
+    }
+    
+    
+    func taskFailed(){
+        
+        
+        
+    }
+
 
 
 }

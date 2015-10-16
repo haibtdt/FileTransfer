@@ -49,15 +49,20 @@ public class DownloadTask {
                 }
                 
            
+                do {
                     
-                if let _ = try? NSFileManager.defaultManager().moveItemAtPath(url!.path!, toPath: self.filePath!) {
-                    
+                    try NSFileManager.defaultManager().moveItemAtURL(url!, toURL: NSURL(string: self.filePath!)!)
+                        
                     self.observer?.taskDone(self)
                     
                     
-                } else {
+
+                } catch {
                     
+                    print(error as NSError)
                     self.observer?.taskFailed(self)
+                    
+
                     
                 }
 
