@@ -30,7 +30,7 @@ class DetailViewController: UIViewController, DownloadTaskManagerObserver {
         
         if downloadManager_ == nil {
             
-            downloadManager_ = DownloadTaskManager(tempDirectoryURL: saveDirURL)
+            downloadManager_ = DownloadTaskManager()
             downloadManager_?.observer = self
             
         }
@@ -105,15 +105,26 @@ class DetailViewController: UIViewController, DownloadTaskManagerObserver {
     
     func taskAdded (url : NSURL, saveAs filePath : NSURL){
         
-        taskStatusLabel.text = "added \(url) as a task and will be saved at \(filePath)"
-        
+        dispatch_async(dispatch_get_main_queue()) { () -> Void in
+            
+            self.taskStatusLabel.text = "added \(url) as a task and will be saved at \(filePath)"
+            
+            
+        }
+
     }
     
     
     func taskActivated (url : NSURL, saveAs filePath : NSURL){
         
-        
-        taskStatusLabel.text = "activated \(url) as a task and will be saved at \(filePath)"
+        dispatch_async(dispatch_get_main_queue()) { () -> Void in
+            
+
+            self.taskStatusLabel.text = "activated \(url) as a task and will be saved at \(filePath)"
+            
+            
+        }
+
 
         
     }
@@ -121,7 +132,14 @@ class DetailViewController: UIViewController, DownloadTaskManagerObserver {
     
     func taskCompleted(url : NSURL, saveAs filePath : NSURL) {
         
-        taskStatusLabel.text = "completed \(url) as a task and will be saved at \(filePath)"
+        dispatch_async(dispatch_get_main_queue()) { () -> Void in
+            
+
+            self.taskStatusLabel.text = "completed \(url) as a task and will be saved at \(filePath)"
+
+            
+        }
+
  
         
     }
@@ -129,14 +147,25 @@ class DetailViewController: UIViewController, DownloadTaskManagerObserver {
     
     func taskRemoved(){
         
-        
+        dispatch_async(dispatch_get_main_queue()) { () -> Void in
+            
+            
+            
+        }
+
         
     }
     
     
     func taskFailed(){
         
-        
+        dispatch_async(dispatch_get_main_queue()) { () -> Void in
+            
+            self.taskStatusLabel.text = "task faied"
+
+            
+        }
+
         
     }
 

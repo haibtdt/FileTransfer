@@ -22,12 +22,12 @@ public protocol DownloadTaskManagerObserver : class {
 
 public class DownloadTaskManager: NSObject , DownloadTaskTrackerObserver {
     
+    /// the observer is informed of events related to some task
     weak public var observer : DownloadTaskManagerObserver?  = nil
     
     let persistenceSetup : DownloadTaskManagerPersistenceStackSetup
-    let temptDirectoryURL : NSURL
 
-    public init(tempDirectoryURL : NSURL, var databasesURL : NSURL? = nil) {
+    public init(var databasesURL : NSURL? = nil) {
         
         if databasesURL == nil {
             
@@ -44,7 +44,6 @@ public class DownloadTaskManager: NSObject , DownloadTaskTrackerObserver {
         }
         
         persistenceSetup = DownloadTaskManagerPersistenceStackSetup(storePath: databasesURL!)
-        self.temptDirectoryURL = tempDirectoryURL
         persistenceSetup.setUpContext()
         
         
@@ -116,7 +115,7 @@ public class DownloadTaskManager: NSObject , DownloadTaskTrackerObserver {
             }
             
             let downloadTask = DownloadTask(url: NSURL(string: metaData.remoteURL!)!)
-            downloadTask.filePath = metaData.fileURL!
+            downloadTask.fileURL = NSURL(string: metaData.fileURL!)!
             currentActiveTracker_ = DownloadTaskTracker(task: downloadTask, meta: metaData)
             currentActiveTracker_?.trackerObserver = self
             break

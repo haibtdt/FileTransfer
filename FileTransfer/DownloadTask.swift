@@ -19,7 +19,7 @@ protocol DownloadTaskObserver : class{
 public class DownloadTask {
 
 /// Where the complete downloaded file is stored
-    public var filePath : String? = nil
+    public var fileURL : NSURL? = nil
     
 /// The url from which the file is downloaded
     public var remoteURL : NSURL
@@ -34,12 +34,13 @@ public class DownloadTask {
     var urlSession = NSURLSession(configuration: NSURLSessionConfiguration.defaultSessionConfiguration())
     var downloadTask : NSURLSessionDownloadTask? = nil
 
-    /// Begin or resume the download
+    /// Begin the download
     public func resume () {
         
         if downloadTask == nil {
             
-            downloadTask = urlSession.downloadTaskWithURL(remoteURL, completionHandler: { (url : NSURL?, res : NSURLResponse?, err : NSError?) -> Void in
+            downloadTask = urlSession.downloadTaskWithURL(remoteURL,
+                completionHandler: { (url : NSURL?, res : NSURLResponse?, err : NSError?) -> Void in
                 
                 guard err == nil else {
                     
@@ -51,18 +52,14 @@ public class DownloadTask {
            
                 do {
                     
-                    try NSFileManager.defaultManager().moveItemAtURL(url!, toURL: NSURL(string: self.filePath!)!)
-                        
+                    try NSFileManager.defaultManager().moveItemAtURL(url!, toURL: self.fileURL!)
                     self.observer?.taskDone(self)
-                    
                     
 
                 } catch {
                     
                     print(error as NSError)
                     self.observer?.taskFailed(self)
-                    
-
                     
                 }
 
@@ -73,7 +70,6 @@ public class DownloadTask {
             observer?.taskStarted(self)
             
         }
-        
         
         
     }
