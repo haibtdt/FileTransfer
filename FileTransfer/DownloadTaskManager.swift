@@ -14,8 +14,8 @@ public protocol DownloadTaskManagerObserver : class {
     func taskAdded (url : NSURL, saveAs filePath : NSURL)
     func taskActivated (url : NSURL, saveAs filePath : NSURL)
     func taskCompleted(url : NSURL, saveAs filePath : NSURL)
-    func taskRemoved()
-    func taskFailed()
+    func taskRemoved(url : NSURL)
+    func taskFailed(url : NSURL, saveAs filePath : NSURL)
     
     
 }
@@ -35,7 +35,7 @@ public class DownloadTaskManager: NSObject , DownloadTaskTrackerObserver {
                 
                 let defaultFileManager = NSFileManager.defaultManager()
                 let appDirURL = try! defaultFileManager.URLForDirectory(NSSearchPathDirectory.ApplicationSupportDirectory, inDomain: .UserDomainMask, appropriateForURL: nil, create: true)
-                return appDirURL.URLByAppendingPathComponent("assets.store")
+                return appDirURL.URLByAppendingPathComponent("downloads.store")
                 
                 
             }
@@ -66,7 +66,7 @@ public class DownloadTaskManager: NSObject , DownloadTaskTrackerObserver {
     
     public func deleteDownload (at url : NSURL) {
         
-        observer?.taskRemoved()
+        observer?.taskRemoved(url)
         
     }
     
@@ -161,7 +161,7 @@ public class DownloadTaskManager: NSObject , DownloadTaskTrackerObserver {
             observer?.taskCompleted(remoteURL, saveAs: fileURL)
             currentActiveTracker_ = nil
         case .Failed:
-            observer?.taskFailed()
+            observer?.taskFailed(task.remoteURL, saveAs: task.fileURL!)
             currentActiveTracker_ = nil
         case .InProgress:
             observer?.taskActivated(remoteURL, saveAs: fileURL)

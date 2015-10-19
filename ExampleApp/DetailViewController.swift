@@ -145,7 +145,7 @@ class DetailViewController: UIViewController, DownloadTaskManagerObserver {
     }
     
     
-    func taskRemoved(){
+    func taskRemoved(url : NSURL){
         
         dispatch_async(dispatch_get_main_queue()) { () -> Void in
             
@@ -157,7 +157,7 @@ class DetailViewController: UIViewController, DownloadTaskManagerObserver {
     }
     
     
-    func taskFailed(){
+    func taskFailed(url : NSURL, saveAs filePath : NSURL){
         
         dispatch_async(dispatch_get_main_queue()) { () -> Void in
             
