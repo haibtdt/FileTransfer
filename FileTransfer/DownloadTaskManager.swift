@@ -158,13 +158,16 @@ public class DownloadTaskManager: NSObject , DownloadTaskTrackerObserver {
         switch TaskStatus(rawValue: (tracker.downloadTaskMetaData?.status?.integerValue)!)! {
             
         case .Done:
-            observer?.taskCompleted(remoteURL, saveAs: fileURL)
             currentActiveTracker_ = nil
+            observer?.taskCompleted(remoteURL, saveAs: fileURL)
+            
         case .Failed:
             observer?.taskFailed(task.remoteURL, saveAs: task.fileURL!)
             currentActiveTracker_ = nil
+            
         case .InProgress:
             observer?.taskActivated(remoteURL, saveAs: fileURL)
+            
         case .Added:
             assert(false)
             
