@@ -64,6 +64,29 @@ public class DownloadTaskManager: NSObject , DownloadTaskTrackerObserver {
         
     }
     
+    
+    public func getTask (remoteURL : String) -> AnyObject?{
+        
+        let fetchRequest = NSFetchRequest(entityName: DownloadTaskMetaData.entityName)
+        fetchRequest.predicate = NSPredicate(format: "remoteURL == %@", argumentArray: [remoteURL])
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            
+            let results = try persistenceSetup.context.executeFetchRequest(fetchRequest)
+            return results.first
+            
+            
+        } catch {
+            
+            return nil
+            
+        }
+
+        
+    }
+    
+    
     public func deleteDownload (at url : NSURL) {
         
         observer?.taskRemoved(url)
