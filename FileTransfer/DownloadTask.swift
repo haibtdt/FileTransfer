@@ -74,4 +74,10 @@ public class DownloadTask {
         
     }
     
+    public func stop () {
+        
+        downloadTask?.cancel()
+        
+    }
+    
 }

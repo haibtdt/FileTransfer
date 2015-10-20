@@ -117,7 +117,7 @@ public class DownloadTaskManager: NSObject , DownloadTaskTrackerObserver {
     
     
     var currentActiveTracker_ : DownloadTaskTracker? = nil
-    var currentActiveTracker : DownloadTaskTracker? {
+    var getActiveTracker : DownloadTaskTracker? {
         
         guard currentActiveTracker_ == nil else {
             
@@ -153,8 +153,21 @@ public class DownloadTaskManager: NSObject , DownloadTaskTrackerObserver {
     
     public func resume () {
         
-        currentActiveTracker?.downloadTask?.resume()
+        getActiveTracker?.downloadTask?.resume()
 
+        
+    }
+    
+    public func clearAllTasks () {
+        
+        currentActiveTracker_?.downloadTask?.stop()
+        currentActiveTracker_ = nil
+        for metaData in allDownloadTasksMetadata {
+            
+            persistenceSetup.context.deleteObject(metaData)
+            
+        }
+        let _ = try! persistenceSetup.context.save()
         
     }
     
